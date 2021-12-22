@@ -1,0 +1,2 @@
+api_routes:
+    resource: '../src/API/Resources/config/routes.yaml'

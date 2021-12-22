@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    # controllers are imported separately to make sure services can be injected
+    # as action arguments even if you don't extend any base controller class
+    API\Controller\VendingController:
+        arguments: ['@api.service.vending', '@api.service.formatrequest', '@api.service.formatresponse']
+        tags: ['controller.service_arguments']

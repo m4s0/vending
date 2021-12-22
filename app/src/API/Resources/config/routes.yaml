@@ -1,0 +1,49 @@
+app.swagger_ui:
+    path: /
+    methods: GET
+    defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
+
+app.swagger:
+    path: /doc.json
+    methods: GET
+    defaults: { _controller: nelmio_api_doc.controller.swagger }
+
+api::vending-coin-insert:
+    path: /api/coin/insert/{coin}
+    defaults: { _controller: API\Controller\VendingController:postCoinInsertAction }
+    methods: POST
+
+api::vending-coin-return:
+    path: /api/coin/return
+    defaults: { _controller: API\Controller\VendingController:getCoinReturnAction }
+    methods: GET
+
+api::vending-coin-status:
+    path: /api/coin/status
+    defaults: { _controller: API\Controller\VendingController:getCoinStatusAction }
+    methods: GET
+
+api::vending-item-buy:
+    path: /api/item/buy/{name}
+    defaults: { _controller: API\Controller\VendingController:getItemBuyAction }
+    methods: GET
+
+api::vending-item-status:
+    path: /api/item/status
+    defaults: { _controller: API\Controller\VendingController:getItemStatusAction }
+    methods: GET
+
+api::vending-service-item:
+    path: /api/service/item/{name}
+    defaults: { _controller: API\Controller\VendingController:putServiceItemAction }
+    methods: PUT
+
+api::vending-service-coin:
+    path: /api/service/coin/{coin}
+    defaults: { _controller: API\Controller\VendingController:putServiceCoinAction }
+    methods: PUT
+
+api::vending-service-status:
+    path: /api/service/status
+    defaults: { _controller: API\Controller\VendingController:getServiceStatusAction }
+    methods: GET

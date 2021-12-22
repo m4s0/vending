@@ -1,0 +1,10 @@
+nelmio_api_doc:
+    areas:
+        path_patterns: # an array of regexps
+            - ^/api
+
+    documentation:
+        info:
+            title: Vending Machine
+            description: This is an example of DDD + CQRS + EventSourcing
+            version: 1.0.0

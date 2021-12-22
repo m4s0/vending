@@ -1,0 +1,146 @@
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    Core\Domain\Model\Item\Handler\CreateItemHandler:
+        arguments: ['@item_collection']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_command_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Item\Handler\BuyItemHandler:
+        arguments: ['@item_collection']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_command_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Item\Handler\UpdateItemAmountHandler:
+        arguments: ['@item_collection']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_command_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Item\Handler\UpdateItemPriceHandler:
+        arguments: ['@item_collection']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_command_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Item\Handler\GetAllItemsHandler:
+        arguments: ['@core.projection.item_finder']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_query_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Item\Handler\GetItemByIdHandler:
+        arguments: ['@core.projection.item_finder']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_query_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Item\Handler\GetItemByNameHandler:
+        arguments: ['@core.projection.item_finder']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_query_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Coin\Handler\CreateCoinHandler:
+        arguments: ['@coin_collection']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_command_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Coin\Handler\InsertCoinHandler:
+        arguments: ['@coin_collection']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_command_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Coin\Handler\ReturnCoinHandler:
+        arguments: ['@coin_collection']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_command_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Coin\Handler\UpdateCoinAmountHandler:
+        arguments: ['@coin_collection']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_command_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Coin\Handler\GetAllCoinsHandler:
+        arguments: ['@core.projection.coin_finder','@core.projection.coin_resume_finder']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_query_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Coin\Handler\GetCoinByIdHandler:
+        arguments: ['@core.projection.coin_finder']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_query_bus.route_target', message_detection: true }
+
+    Core\Domain\Model\Coin\Handler\GetCoinByValueHandler:
+        arguments: ['@core.projection.coin_finder']
+        public: true
+        tags:
+            - { name: 'prooph_service_bus.vending_query_bus.route_target', message_detection: true }
+
+    core.service.item_service:
+        class: Core\Application\Service\ItemService
+        arguments: ['@prooph_service_bus.vending_command_bus', '@prooph_service_bus.vending_query_bus', '@prooph_service_bus.message_factory']
+        public: true
+
+    core.service.coin_service:
+        class: Core\Application\Service\CoinService
+        arguments: ['@prooph_service_bus.vending_command_bus', '@prooph_service_bus.vending_query_bus', '@prooph_service_bus.message_factory']
+        public: true
+
+    core.projection.item_finder:
+        class: Core\Infrastructure\Projection\Item\ItemFinder
+        arguments: ['@doctrine.dbal.default_connection']
+
+    core.projection.coin_finder:
+        class: Core\Infrastructure\Projection\Coin\CoinFinder
+        arguments: ['@doctrine.dbal.default_connection']
+
+    core.projection.coin_resume_finder:
+        class: Core\Infrastructure\Projection\Coin\CoinResumeFinder
+        arguments: ['@doctrine.dbal.default_connection']
+
+    Core\Infrastructure\Projection\Item\ItemProjection: ~
+    Core\Infrastructure\Projection\Item\ItemReadModel:
+        arguments: ['@doctrine.dbal.default_connection']
+
+    Core\Infrastructure\Projection\Coin\CoinProjection: ~
+    Core\Infrastructure\Projection\Coin\CoinReadModel:
+        arguments: ['@doctrine.dbal.default_connection']
+
+    Core\Infrastructure\Command\CreateEventStreamCommand:
+        tags:
+            - { name: 'console.command', command: 'event-store:event-stream:create' }
+
+    Core\Infrastructure\Command\LoadDefaultValuesCommand:
+        tags:
+            - { name: 'console.command', command: 'vending-machine:load' }
+
+    Prooph\EventStore\EventStore:
+        alias: 'Prooph\EventStore\Pdo\MySqlEventStore'
+        public: true
+
+    Prooph\EventStore\ReadOnlyEventStore:
+        alias: 'Prooph\EventStore\Pdo\MySqlEventStore'
+        public: true
+
+    Prooph\Common\Messaging\MessageFactory:
+        alias: 'prooph_service_bus.message_factory'
+        public: true
+
+    prooph_event_store_bus_bridge.vending_event_publisher:
+        class: Prooph\EventStoreBusBridge\EventPublisher
+        arguments: ['@prooph_service_bus.vending_event_bus']
+        public: true
+        tags:
+          - { name: 'prooph_event_store.vending_store.plugin' }

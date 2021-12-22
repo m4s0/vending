@@ -31,6 +31,22 @@ bash:
 install:
 	cd docker && docker-compose run --rm php-fpm sh -c 'composer install --no-interaction --ansi'
 
+.PHONY: create-event-stream
+create-event-stream:
+	cd docker && docker-compose run --rm php-fpm sh -c "bin/console event-store:event-stream:create"
+
+.PHONY: load-default-items-and-coins
+load-default-items-and-coins:
+	cd docker && docker-compose run --rm php-fpm sh -c "bin/console vending-machine:load"
+
+.PHONY: run-coin-projection
+run-coin-projection:
+	cd docker && docker-compose run --rm php-fpm sh -c "bin/console event-store:projection:run coin_projection -o"
+
+.PHONY: run-item-projection
+run-item-projection:
+	cd docker && docker-compose run --rm php-fpm sh -c "bin/console event-store:projection:run item_projection -o"
+
 .PHONY: dump-autoload
 dump-autoload:
 	cd docker && docker-compose run --rm php-fpm sh -c 'composer dump-autoload --no-dev --classmap-authoritative'

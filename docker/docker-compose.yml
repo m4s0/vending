@@ -35,6 +35,42 @@ services:
     volumes:
       - ../app:/var/app
 
+  projection-coin:
+    container_name: projection-coin
+    build:
+      context: ./php-fpm
+      args:
+        - XDEBUG_ENABLED=${XDEBUG_ENABLED}
+    depends_on:
+      - db
+    environment:
+      - XDEBUG_CONFIG=${XDEBUG_CONFIG}
+      - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
+      - APP_ENV=${APP_ENV}
+      - APP_SECRET=${APP_SECRET}
+      - DATABASE_URL=mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@db:3306/${DATABASE_NAME}
+    volumes:
+      - ../app:/var/app
+    command: php bin/console event-store:projection:run coin_projection
+
+  projection-item:
+    container_name: projection-item
+    build:
+      context: ./php-fpm
+      args:
+        - XDEBUG_ENABLED=${XDEBUG_ENABLED}
+    depends_on:
+      - db
+    environment:
+      - XDEBUG_CONFIG=${XDEBUG_CONFIG}
+      - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
+      - APP_ENV=${APP_ENV}
+      - APP_SECRET=${APP_SECRET}
+      - DATABASE_URL=mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@db:3306/${DATABASE_NAME}
+    volumes:
+      - ../app:/var/app
+    command: php bin/console event-store:projection:run item_projection
+
   nginx:
     container_name: nginx
     build:

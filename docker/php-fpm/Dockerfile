@@ -13,12 +13,15 @@ RUN apk --update --no-cache add bash \
     && apk add php7-ctype \
     && apk add php7-posix \
     && apk add php7-intl \
-    && apk add php7-opcache  \
+    && apk add php7-opcache \
+    && apk add php7-bcmath \
+    && apk add php7-gmp \
+    && apk add gmp gmp-dev \
+    && apk add icu-dev \
+    && apk add alpine-conf \
     && apk add $PHPIZE_DEPS \
     && pecl install apcu \
-    && apk add icu-dev \
-    && pecl install xdebug \
-    && apk add alpine-conf
+    && pecl install xdebug
 
 RUN setup-timezone -z Europe/Rome
 
@@ -26,6 +29,9 @@ RUN docker-php-ext-install pdo_mysql \
     && docker-php-ext-install intl \
     && docker-php-ext-configure intl \
     && docker-php-ext-enable intl \
+    && docker-php-ext-install opcache \
+    && docker-php-ext-install bcmath \
+    && docker-php-ext-install gmp \
     && docker-php-ext-install opcache \
     && docker-php-ext-enable apcu
 

@@ -1,0 +1,40 @@
+prooph_event_store:
+    stores:
+        vending_store:
+            event_store: Prooph\EventStore\Pdo\MySqlEventStore
+            repositories:
+                item_collection:
+                    repository_class: Core\Infrastructure\Repository\EventStoreItemCollection
+                    aggregate_type: Core\Domain\Model\Item\Item
+                    aggregate_translator: prooph_event_sourcing.aggregate_translator
+
+                coin_collection:
+                    repository_class: Core\Infrastructure\Repository\EventStoreCoinCollection
+                    aggregate_type: Core\Domain\Model\Coin\Coin
+                    aggregate_translator: prooph_event_sourcing.aggregate_translator
+    projection_managers:
+        vending_projection_manager:
+            event_store: Prooph\EventStore\Pdo\MySqlEventStore # event store
+            connection: 'doctrine.pdo.connection'
+            projections:
+                item_projection:
+                    read_model: Core\Infrastructure\Projection\Item\ItemReadModel
+                    projection: Core\Infrastructure\Projection\Item\ItemProjection
+                coin_projection:
+                    read_model: Core\Infrastructure\Projection\Coin\CoinReadModel
+                    projection: Core\Infrastructure\Projection\Coin\CoinProjection
+
+
+services:
+    Prooph\EventStore\Pdo\MySqlEventStore:
+        arguments: ['@prooph_event_store.message_factory', '@doctrine.pdo.connection', '@prooph_event_store.single_stream_strategy']
+
+    doctrine.pdo.connection:
+        class: PDO
+        factory: ['@database_connection', getWrappedConnection]
+
+    prooph_event_store.single_stream_strategy:
+        class: Prooph\EventStore\Pdo\PersistenceStrategy\MySqlSingleStreamStrategy
+
+    prooph_event_sourcing.aggregate_translator:
+        class: Prooph\EventSourcing\EventStoreIntegration\AggregateTranslator
